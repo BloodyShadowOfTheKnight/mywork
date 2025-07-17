@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyClassGrid</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f0f1b;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --text: #e0e0ff;
+      --accent: #00ffe7;
+      --danger: #ff3c74;
+      --success: #0f0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0f0f1b, #1a1a2e);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    nav {
+      width: 240px;
+      background: var(--glass-bg);
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      border-right: 2px solid var(--accent);
+      backdrop-filter: blur(10px);
+    }
+
+    nav h2 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      margin: 1rem 0;
+      padding: 0.7rem;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    nav a:hover,
+    nav a.active {
+      background: var(--accent);
+      color: #000;
+    }
+
+    nav .logout {
+      margin-top: auto;
+      background: var(--danger);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .logo {
+      margin: auto;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      animation: rotateLogo 6s linear infinite;
+      background: rgba(0, 255, 231, 0.1);
+      margin-bottom: 1rem;
+    }
+
+    @keyframes rotateLogo {
+      0% { transform: rotate(0); }
+      100% { transform: rotate(360deg); }
+    }
+
+    main {
+      flex-grow: 1;
+      padding: 2rem;
+    }
+
+    section {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      background: #1b1b2b;
+      color: white;
+    }
+
+    .form-group button {
+      background: var(--accent);
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .day-box {
+      background: #1e1e30;
+      padding: 1rem;
+      border-radius: 10px;
+      min-height: 150px;
+      border: 1px solid var(--accent);
+    }
+
+    .day-box h4 {
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .class-entry {
+      background: #292943;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      position: relative;
+    }
+
+    .class-entry button {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      background: transparent;
+      color: var(--accent);
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <nav id="sidebar">
+    <div class="logo">MCG</div>
+    <h2>MyClassGrid</h2>
+    <div id="usernameDisplay"></div>
+    <a onclick="showTab('loginTab')" id="loginTabBtn" class="active">Login</a>
+    <a onclick="showTab('signupTab')" id="signupTabBtn">Sign Up</a>
+    <a onclick="showTab('home')" class="hidden">Home</a>
+    <a onclick="showTab('add')" class="hidden">Add Class</a>
+    <a onclick="showTab('week')" class="hidden">Weekly View</a>
+    <a onclick="showTab('month')" class="hidden">Monthly View</a>
+    <a onclick="showTab('attendance')" class="hidden">Attendance</a>
+    <a onclick="showTab('contact')" class="hidden">Contact Us</a>
+    <a class="logout hidden" onclick="logout()">Logout</a>
+  </nav>
+
+  <main>
+    <section id="loginTab" class="active">
+      <h2>Login to MyClassGrid</h2>
+      <form onsubmit="login(event)">
+        <div class="form-group">
+          <input id="loginUsername" placeholder="Username" required />
+          <input id="loginPassword" type="password" placeholder="Password" required />
+          <button type="submit">Login</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="signupTab">
+      <h2>Sign Up for MyClassGrid</h2>
+      <form onsubmit="signup(event)">
+        <div class="form-group">
+          <input id="signupUsername" placeholder="Username" required />
+          <input id="signupPassword" type="password" placeholder="Password" required />
+          <button type="submit">Create Account</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="home">
+      <h1>Welcome to <span style="color: var(--accent)">MyClassGrid</span></h1>
+      <p>Your sci-fi inspired timetable and attendance planner!</p>
+    </section>
+
+    <section id="add">
+      <h2>Add Class</h2>
+      <form onsubmit="addClass(event)">
+        <div class="form-group">
+          <input id="name" placeholder="Class Name" required />
+          <input id="time" type="time" required />
+          <input id="room" placeholder="Room No." required />
+          <select id="day" required>
+            <option value="">Select Day</option>
+            <option>Monday</option>
+            <option>Tuesday</option>
+            <option>Wednesday</option>
+            <option>Thursday</option>
+            <option>Friday</option>
+            <option>Saturday</option>
+            <option>Sunday</option>
+          </select>
+          <button type="submit">Add Class</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="week">
+      <h2>Weekly Calendar</h2>
+      <div class="calendar" id="weekCalendar"></div>
+    </section>
+
+    <section id="month">
+      <h2>Monthly View</h2>
+      <ul id="monthList"></ul>
+    </section>
+
+    <section id="attendance">
+      <h2>Attendance Calculator</h2>
+      <form onsubmit="calculateAttendance(event)">
+        <div class="form-group">
+          <input id="totalClasses" type="number" placeholder="Total Classes" required />
+          <input id="attendedClasses" type="number" placeholder="Attended Classes" required />
+          <button type="submit">Calculate</button>
+        </div>
+      </form>
+      <p id="attendanceResult"></p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact Us</h2>
+      <p>Creator of the website: Shayan Gon Choudhury</p>
+      <p>Email: shayangc04@gmail.com</p>
+      <p>Whatsapp: 9366371596</p>
+    </section>
+  </main>
+
+  <script>
+    let currentUser = null;
+    localStorage.removeItem('currentUser');
+    let users = JSON.parse(localStorage.getItem('users')) || {};
+    let timetable = [];
+
+    function showTab(id) {
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+
+      document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+      const target = [...document.querySelectorAll('nav a')].find(a => a.getAttribute('onclick')?.includes(id));
+      if (target) target.classList.add('active');
+
+      if (id === 'week') renderWeek();
+      if (id === 'month') renderMonth();
+    }
+
+    function login(e) {
+      e.preventDefault();
+      const u = loginUsername.value;
+      const p = loginPassword.value;
+      if (users[u] && users[u] === p) {
+        currentUser = u;
+        timetable = JSON.parse(localStorage.getItem(currentUser + '_timetable')) || [];
+        showDashboard();
+      } else {
+        alert("Invalid username or password");
+      }
+    }
+
+    function signup(e) {
+      e.preventDefault();
+      const u = signupUsername.value;
+      const p = signupPassword.value;
+      if (users[u]) {
+        alert("Username already exists");
+        return;
+      }
+      users[u] = p;
+      localStorage.setItem('users', JSON.stringify(users));
+      alert("Account created. Please login.");
+      showTab('loginTab');
+    }
+
+    function showDashboard() {
+      document.getElementById('loginTab').style.display = 'none';
+      document.getElementById('signupTab').style.display = 'none';
+      document.getElementById('loginTabBtn').style.display = 'none';
+      document.getElementById('signupTabBtn').style.display = 'none';
+
+      [...document.querySelectorAll('nav a')].forEach(a => a.classList.remove('hidden'));
+      document.querySelector('.logout').classList.remove('hidden');
+
+      showTab('home');
+      document.getElementById('usernameDisplay').innerHTML = `<strong>User:</strong> ${currentUser}`;
+    }
+
+    function logout() {
+      location.reload();
+    }
+
+    function saveTimetable() {
+      localStorage.setItem(currentUser + '_timetable', JSON.stringify(timetable));
+    }
+
+    function addClass(e) {
+      e.preventDefault();
+      const entry = {
+        id: Date.now(),
+        name: name.value,
+        time: time.value,
+        room: room.value,
+        day: day.value
+      };
+      timetable.push(entry);
+      saveTimetable();
+      e.target.reset();
+      alert("Class added!");
+    }
+
+    function renderWeek() {
+      const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+      const container = document.getElementById('weekCalendar');
+      container.innerHTML = '';
+      days.forEach(d => {
+        const box = document.createElement('div');
+        box.className = 'day-box';
+        box.innerHTML = `<h4>${d}</h4>`;
+        timetable.filter(c => c.day === d).forEach(cls => {
+          const entry = document.createElement('div');
+          entry.className = 'class-entry';
+          entry.innerHTML = `
+            <strong>${cls.name}</strong><br>${cls.time} | Room ${cls.room}
+            <button onclick="editClass(${cls.id})">✏</button>
+            <button onclick="deleteClass(${cls.id})">🗑</button>
+          `;
+          box.appendChild(entry);
+        });
+        container.appendChild(box);
+      });
+    }
+
+    function renderMonth() {
+      const list = document.getElementById('monthList');
+      list.innerHTML = '';
+      timetable.forEach(cls => {
+        const li = document.createElement('li');
+        li.innerHTML = `${cls.day} - <strong>${cls.name}</strong> at ${cls.time} (Room ${cls.room}) <button onclick="editClass(${cls.id})">✏</button> <button onclick="deleteClass(${cls.id})">🗑</button>`;
+        list.appendChild(li);
+      });
+    }
+
+    function deleteClass(id) {
+      if (!confirm("Delete this class?")) return;
+      timetable = timetable.filter(c => c.id !== id);
+      saveTimetable();
+      renderWeek();
+      renderMonth();
+    }
+
+    function editClass(id) {
+      const cls = timetable.find(c => c.id === id);
+      const newName = prompt("Edit Class Name", cls.name);
+      const newTime = prompt("Edit Time", cls.time);
+      const newRoom = prompt("Edit Room", cls.room);
+      const newDay = prompt("Edit Day", cls.day);
+
+      if (newName && newTime && newRoom && newDay) {
+        cls.name = newName;
+        cls.time = newTime;
+        cls.room = newRoom;
+        cls.day = newDay;
+        saveTimetable();
+        renderWeek();
+        renderMonth();
+      }
+    }
+
+    function calculateAttendance(e) {
+      e.preventDefault();
+      const total = parseInt(totalClasses.value);
+      const attended = parseInt(attendedClasses.value);
+      if (isNaN(total) || isNaN(attended) || total <= 0 || attended < 0 || attended > total) {
+        attendanceResult.textContent = "Please enter valid numbers.";
+        return;
+      }
+      const percent = ((attended / total) * 100).toFixed(2);
+      attendanceResult.innerHTML = `Attendance: <strong>${percent}%</strong>`;
+    }
+  </script>
+</body>
+</html>
